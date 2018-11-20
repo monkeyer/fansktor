@@ -2,12 +2,12 @@ package fans.ktor.example
 
 import io.ktor.application.*
 import io.ktor.features.CallLogging
+import io.ktor.features.ContentNegotiation
 import io.ktor.features.DefaultHeaders
 import io.ktor.http.ContentType
 import io.ktor.response.*
-import io.ktor.request.*
-import io.ktor.routing.Routing
 import io.ktor.routing.get
+import io.ktor.routing.routing
 import java.util.*
 
 fun main(args: Array<String>): Unit = io.ktor.server.netty.DevelopmentEngine.main(args)
@@ -15,7 +15,10 @@ fun main(args: Array<String>): Unit = io.ktor.server.netty.DevelopmentEngine.mai
 fun Application.module() {
     install(DefaultHeaders)
     install(CallLogging)
-    install(Routing) {
+    install(ContentNegotiation) {
+    }
+
+    routing {
         get("/") {
             var html = "<li><a href = 'hello'>hello</a></li>"
             html += "<li><a href = 'now'>now</a></li>"
@@ -28,6 +31,14 @@ fun Application.module() {
 
         get("/now") {
             call.respondText("Now time is : ${Date()}", ContentType.Text.Html)
+        }
+
+        get("/json") {
+            call.respond(mapOf("hello" to "world"))
+        }
+
+        get("/json2") {
+            call.respond(mapOf("OK" to true))
         }
     }
 }
