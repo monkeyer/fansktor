@@ -1,9 +1,12 @@
 package fans.ktor.example
 
+import fans.ktor.example.model.IndexData
+import freemarker.cache.ClassTemplateLoader
 import io.ktor.application.*
 import io.ktor.features.CallLogging
-import io.ktor.features.ContentNegotiation
 import io.ktor.features.DefaultHeaders
+import io.ktor.freemarker.FreeMarker
+import io.ktor.freemarker.FreeMarkerContent
 import io.ktor.http.ContentType
 import io.ktor.response.*
 import io.ktor.routing.get
@@ -15,8 +18,8 @@ fun main(args: Array<String>): Unit = io.ktor.server.netty.EngineMain.main(args)
 fun Application.module() {
     install(DefaultHeaders)
     install(CallLogging)
-    install(ContentNegotiation) {
-//        gson
+    install(FreeMarker) {
+        templateLoader = ClassTemplateLoader(this::class.java.classLoader, "templates")
     }
 
     routing {
@@ -34,12 +37,8 @@ fun Application.module() {
             call.respondText("Now time is : ${Date()}", ContentType.Text.Html)
         }
 
-        get("/json") {
-            call.respond(mapOf("hello" to "world"))
-        }
-
-        get("/json2") {
-            call.respond(mapOf("OK" to true))
+        get("/index") {
+            call.respond(FreeMarkerContent("index.ftl", mapOf("data" to IndexData(listOf(1, 2, 3))), ""))
         }
     }
 }
